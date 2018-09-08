@@ -17,7 +17,8 @@
                     <div class="card-header">
                         {{-- <h3>{{ $article->title }}</h3> by {{ $article->user->name }} --}}
                         <h3><a href="{{ route('article.show', $article) }}">{{ $article->title }}</a>
-                        </h3> by {{ $article->user->name }}
+                        </h3> by
+                        <a href="{{ route('profile', $article->user) }}">{{ $article->user->name }}</a>
                         <span class="float-right">{{ $article->created_at->diffForHumans() }}</span>
                     </div>
 
@@ -25,20 +26,25 @@
                         <p>{{ str_limit($article->body, 100) }}</p>
                         <hr>
 
-                        <div class="float-right">
-                            <a href="{{ route('article.edit', $article) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form class="" action="{{ route('article.destroy', $article) }}" method="post">
-                                @csrf
-                                @method("DELETE")
+                        @if ($article->user_id === auth()->id())
+                            <div class="float-right">
+                                <a href="{{ route('article.edit', $article) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form class="" action="{{ route('article.destroy', $article) }}" method="post">
+                                    @csrf
+                                    @method("DELETE")
 
-                                <input type="submit" value="Delete" class="btn btn-sm btn-danger">
-                            </form>
-                        </div>
+                                    <input type="submit" value="Delete" class="btn btn-sm btn-danger">
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <div class="mb-3"></div>
             @endforeach
+
+            {{ $articles->links() }}
+
             @endif
         </div>
     </div>

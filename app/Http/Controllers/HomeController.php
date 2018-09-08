@@ -24,7 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $articles = Article::latest()->paginate(5);
+        $articles = Article::latest()->paginate(2);
 
         return view('home', compact('articles'));
     }

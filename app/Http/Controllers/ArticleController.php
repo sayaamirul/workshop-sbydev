@@ -14,7 +14,9 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        $articles = Article::latest()->paginate(5);
+
+        return view('home', compact('articles'));
     }
 
     /**
@@ -37,7 +39,7 @@ class ArticleController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'body' => 'required'
+            'body' => 'required|min:15'
         ]);
 
         Article::create([
@@ -47,7 +49,7 @@ class ArticleController extends Controller
             'body' => $request->body
         ]);
 
-        return redirect()->route('home')->withSuccess('Article added');
+        return redirect()->route('home')->with('info', 'Artikel berhasil ditambahkan');
     }
 
     /**
@@ -56,8 +58,10 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Article $article)
+    public function show($article)
     {
+        $article = Article::where('slug', $article)->first();
+
         return view('article.show', compact('article'));
     }
 
@@ -67,8 +71,14 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Article $article)
+    public function edit($article)
     {
+        $article = Article::where('slug', $article)->first();
+
+        if ($article->user_id !== auth()->id()) {
+            return "Dilarang Masuk!";
+        }
+
         return view('article.edit', compact('article'));
     }
 
@@ -79,8 +89,10 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Article $article)
+    public function update(Request $request, $article)
     {
+        $article = Article::where('slug', $article)->first();
+
         $article->update([
             'title' => $request->title,
             'slug' => str_slug($request->title),
@@ -96,8 +108,10 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Article $article)
+    public function destroy($article)
     {
+        $article = Article::where('slug', $article)->first();
+
         $article->delete();
 
         return redirect()->route('home');
